@@ -1,0 +1,8 @@
+{
+  "mention": "<@&1508561705062498385>",
+  "mention_parse": "roles",
+  "min_bet_usd": 100,
+  "history_fetch_limit": 100,
+  "max_seen_per_wallet": 2000,
+  "_comment": "The Discord webhook URL is NOT stored here - it lives in the GitHub repository secret named DISCORD_WEBHOOK_URL. min_bet_usd = smallest buy in USDC that triggers an alert. mention = the Discord role pinged on each alert. history_fetch_limit = how many recent trades to pull per wallet per run."
+}
