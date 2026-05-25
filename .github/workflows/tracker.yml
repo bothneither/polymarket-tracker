@@ -1,0 +1,46 @@
+name: Polymarket Wallet Tracker
+
+# Runs the tracker automatically every 5 minutes (GitHub's minimum interval),
+# and lets you trigger a run by hand from the Actions tab.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+# Allows the workflow to commit the updated state.json back to the repo.
+permissions:
+  contents: write
+
+# Never let two runs overlap.
+concurrency:
+  group: polymarket-tracker
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run the tracker
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python tracker.py
+
+      - name: Commit updated state
+        run: |
+          git config user.name "polymarket-tracker"
+          git config user.email "actions@users.noreply.github.com"
+          if ! git diff --quiet -- state.json; then
+            git add state.json
+            git commit -m "Update tracker state"
+            git push || (git pull --rebase --autostash && git push)
+          else
+            echo "state.json unchanged - nothing to commit"
+          fi
